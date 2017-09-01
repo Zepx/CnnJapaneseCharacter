@@ -5,8 +5,8 @@
 import numpy as np
 import scipy.misc
 from keras import backend as K
-from keras import initializations
-from keras.layers import Convolution2D, MaxPooling2D
+from keras import initializers
+from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
@@ -46,29 +46,25 @@ datagen.fit(X_train)
 model = Sequential()
 
 
-def my_init(shape, name=None):
-    return initializations.normal(shape, scale=0.1, name=name)
-
-
 # Best val_loss: 0.0205 - val_acc: 0.9978 (just tried only once)
 # 30 minutes on Amazon EC2 g2.2xlarge (NVIDIA GRID K520)
 def m6_1():
-    model.add(Convolution2D(32, 3, 3, init=my_init, input_shape=input_shape))
+    model.add(Conv2D(32, (3, 3), kernel_initializer=initializers.VarianceScaling(scale=0.1), input_shape=input_shape))
     model.add(Activation('relu'))
-    model.add(Convolution2D(32, 3, 3, init=my_init))
+    model.add(Conv2D(32, (3, 3), kernel_initializer=initializers.VarianceScaling(scale=0.1)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.5))
 
-    model.add(Convolution2D(64, 3, 3, init=my_init))
+    model.add(Conv2D(64, (3, 3), kernel_initializer=initializers.VarianceScaling(scale=0.1)))
     model.add(Activation('relu'))
-    model.add(Convolution2D(64, 3, 3, init=my_init))
+    model.add(Conv2D(64, (3, 3), kernel_initializer=initializers.VarianceScaling(scale=0.1)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.5))
 
     model.add(Flatten())
-    model.add(Dense(256, init=my_init))
+    model.add(Dense(256, kernel_initializer=initializers.VarianceScaling(scale=0.1)))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(nb_classes))
@@ -90,5 +86,6 @@ m6_1()
 
 model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
-model.fit_generator(datagen.flow(X_train, Y_train, batch_size=16), samples_per_epoch=X_train.shape[0],
-                    nb_epoch=400, validation_data=(X_test, Y_test))
+batch_size = 16
+model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size), steps_per_epoch=X_train.shape[0]/batch_size,
+                    epochs=400, validation_data=(X_test, Y_test))

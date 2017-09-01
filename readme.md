@@ -20,7 +20,7 @@ By these changes the accuracy increased from 96.13% to 99.78%.
 You need following librarys.
 - Anaconda (Python 3.5)
 - Theano 0.8.2 or TensorFlow 0.10.0
-- Keras 1.1.0
+- Keras 2.0.0
 - scikit-learn 0.18.0 (included in Anaconda)
 - CUDA 7.5
 - cuDNN 5.0
